@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2015 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd">
+	
+			
+	<!-- Comment out the annotation driven binding -->
+	<!-- 	<mvc:annotation-driven /> -->
+
+	<!-- Comment out the defaultAnnotationHandlerMapping to use your custom requestMappingHandlerMapping -->
+	<!-- 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" /> -->
+
+	<alias name="customRequestMappingHandlerMapping" alias="requestMappingHandlerMapping"/>
+	<bean id="customRequestMappingHandlerMapping" class="com.notsocomplex.core.CustomRequestMappingHandlerMapping" />
+
+	<!--Note HandlerAdapter Spring3.1 began -->  
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>
+
+	<bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean" />
+
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="webBindingInitializer">
+			<bean
+				class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">
+				<property name="conversionService" ref="conversionService" />
+				<!-- Add if you have a validator. E.g: org.springframework.validation.beanvalidation.LocalValidatorFactoryBean -->
+<!-- 				<property name="validator" ref="validator"/> -->
+			</bean>
+		</property>
+		<property name="messageConverters">
+			<list>
+				<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+				<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+					<property name="writeAcceptCharset" value="false" />
+				</bean>
+				<bean class="org.springframework.http.converter.ResourceHttpMessageConverter" />
+				<bean class="org.springframework.http.converter.xml.SourceHttpMessageConverter" />
+				<bean class="org.springframework.http.converter.xml.XmlAwareFormHttpMessageConverter" />
+				<bean class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter" />
+				<!-- if you have rome present -->
+				<!--<bean class="org.springframework.http.converter.feed.AtomFeedHttpMessageConverter"/> -->
+				<!--<bean class="org.springframework.http.converter.feed.RssChannelHttpMessageConverter"/> -->
+			</list>
+		</property>
+	</bean>
+
+	<bean class="org.springframework.web.servlet.handler.MappedInterceptor">
+		<constructor-arg index="0">
+			<null />
+		</constructor-arg>
+		<constructor-arg index="1" type="org.springframework.web.servlet.HandlerInterceptor">
+			<bean class="org.springframework.web.servlet.handler.ConversionServiceExposingInterceptor">
+				<constructor-arg index="0" ref="conversionService" />
+			</bean>
+		</constructor-arg>
+	</bean>
+	
+</beans>

@@ -1,0 +1,30 @@
+
+Overview and Goals
+
+You work on a project with existing Spring MVC controller and you would like to override some method but you can't change the existing controller.
+With the current implementation of Spring you get a "java.lang.IllegalStateException: Ambiguous mapping found." exeception.
+
+The current solution will allow you to specified which method should be use using a simple annotation. (@OverrideRequestMapping)
+
+Another important point was to be able to continue to scan the controller.
+
+
+Configuration
+
+1- Create new controller by extending the old one.
+2- Add the @OverrideRequestMapping annotation to indicate which method should be use.
+2- Remove <mvc:annotation-driven /> annotation
+3- Add the configuration normally include into <mvc:annotation-driven />
+   See spring-requestmapping-config.xml
+4- Make sure the new controller is scan or declare before the old/original one
+   See xml config
+5- Add the CustomRequestMappingHandlerMapping from NotSoComplex
+6- Make sure that the new customRequestMappingHandlerMapping is declare to override the default requestMappingHandlerMapping
+	<alias name="customRequestMappingHandlerMapping" alias="requestMappingHandlerMapping"/>
+	<bean id="customRequestMappingHandlerMapping" class="com.notsocomplex.core.CustomRequestMappingHandlerMapping" />
+
+
+Test
+1- Should register one method without any 
+2- Should register one method in case an override case
+ 
